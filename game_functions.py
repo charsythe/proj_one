@@ -1,4 +1,5 @@
 import sys
+from time import sleep
 
 import pygame
 
@@ -128,7 +129,39 @@ def change_fleet_direction(ai_settings, aliens):
         alien.rect.y += ai_settings.fleet_drop_speed
     ai_settings.fleet_direction *= -1
 
+def ship_hit(ai_settings, stats, screen, ship, aliens, bullets):
+    """Queue pshew noise."""
+    # Decrement ships_left.
+    stats.ships_left -= 1
+
+    # Empty aliens and bullets.
+    aliens.empty()
+    bullets.empty()
+
+    # Create a new fleet and center the ship.
+    create_fleet(ai_settings, screen, ship, aliens)
+    ship.center_ship()
+
+    # Breather tiem
+    sleep(0.5)
+
+def check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets):
+    """Have they made it to bikini bottom?"""
+    screen_rect = screen.get_rect()
+    for alien in alien.sprites():
+        if alien.rect.bottom >= screen_rect.bottom:
+            """PSCHEW"""
+            ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
+            break
+
 def update_aliens(ai_settings, aliens):
     """Update the positions of all aliens in the fleet."""
     check_fleet_edges(ai_settings, aliens)
     aliens.update()
+
+    # Look for smashy smash.
+    if pygame.sprite.spritecollideany(ship, aliens):
+        ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
+
+    # Look for bikini bottom.
+    check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets)
