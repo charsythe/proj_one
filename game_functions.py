@@ -131,30 +131,34 @@ def change_fleet_direction(ai_settings, aliens):
 
 def ship_hit(ai_settings, stats, screen, ship, aliens, bullets):
     """Queue pshew noise."""
-    # Decrement ships_left.
-    stats.ships_left -= 1
+    if stats.ships_left > 0:
+        # Decrement ships_left.
+        stats.ships_left -= 1
 
-    # Empty aliens and bullets.
-    aliens.empty()
-    bullets.empty()
+        # Empty aliens and bullets.
+        aliens.empty()
+        bullets.empty()
 
-    # Create a new fleet and center the ship.
-    create_fleet(ai_settings, screen, ship, aliens)
-    ship.center_ship()
+        # Create a new fleet and center the ship.
+        create_fleet(ai_settings, screen, ship, aliens)
+        ship.center_ship()
 
-    # Breather tiem
-    sleep(0.5)
+        # Breather tiem
+        sleep(0.5)
+
+    else:
+        stats.game_active = False
 
 def check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets):
     """Have they made it to bikini bottom?"""
     screen_rect = screen.get_rect()
-    for alien in alien.sprites():
+    for alien in aliens.sprites():
         if alien.rect.bottom >= screen_rect.bottom:
             """PSCHEW"""
             ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
             break
 
-def update_aliens(ai_settings, aliens):
+def update_aliens(ai_settings, stats, screen, ship, aliens, bullets):
     """Update the positions of all aliens in the fleet."""
     check_fleet_edges(ai_settings, aliens)
     aliens.update()
