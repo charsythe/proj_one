@@ -3,7 +3,7 @@ from time import sleep
 
 import pygame
 
-def check_events(ai_settings, screen, stats, play_button, ship, aliens,
+def check_events(ai_settings, screen, stats, sb, play_button, ship, aliens,
                  bullets):
     """Respond to keypresses and mouse events."""
     for event in pygame.event.get():
@@ -16,11 +16,11 @@ def check_events(ai_settings, screen, stats, play_button, ship, aliens,
             check_keyup_events(event, ship)
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = pygame.mouse.get_pos()
-            check_play_button(ai_settings, screen, stats, play_button, ship,
-                              aliens, bullets, mouse_x, mouse_y)
+            check_play_button(ai_settings, screen, stats, sb, play_button,
+                              ship, aliens, bullets, mouse_x, mouse_y)
 
-def check_play_button(ai_settings, screen, stats, play_button, ship, aliens,
-                      bullets, mouse_x, mouse_y):
+def check_play_button(ai_settings, screen, stats, sb, play_button, ship,
+                      aliens, bullets, mouse_x, mouse_y):
     """Start a new game when the player hits da button."""
     button_clicked = play_button.rect.collidepoint(mouse_x, mouse_y)
     if button_clicked and not stats.game_active:
@@ -31,6 +31,11 @@ def check_play_button(ai_settings, screen, stats, play_button, ship, aliens,
         pygame.mouse.set_visible(False)
         stats.reset_stats()
         stats.game_active = True
+
+        # Reset scoreboard.
+        sb.prep_score()
+        sb.prep_high_score()
+        sb.prep_level()
 
         # Empty aliens & bullets.
         aliens.empty()
@@ -117,9 +122,14 @@ def check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship,
         check_high_score(stats, sb)
 
     if len(aliens) == 0:
-        # Destroy existing bullets, create faster fleet.
+        # if fleet destroyed, start new level.
         bullets.empty()
         ai_settings.increase_speed()
+
+        # Increase level.
+        stats.level += 1
+        sb.prep_level()
+
         create_fleet(ai_settings, screen, ship, aliens)
 
 def get_number_aliens_x(ai_settings, alien_width):
