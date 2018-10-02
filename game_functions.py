@@ -36,6 +36,7 @@ def check_play_button(ai_settings, screen, stats, sb, play_button, ship,
         sb.prep_score()
         sb.prep_high_score()
         sb.prep_level()
+        sb.prep_ships()
 
         # Empty aliens & bullets.
         aliens.empty()
@@ -182,11 +183,14 @@ def change_fleet_direction(ai_settings, aliens):
         alien.rect.y += ai_settings.fleet_drop_speed
     ai_settings.fleet_direction *= -1
 
-def ship_hit(ai_settings, stats, screen, ship, aliens, bullets):
+def ship_hit(ai_settings, screen, stats, sb, ship, aliens, bullets):
     """Queue pshew noise."""
     if stats.ships_left > 0:
         # Decrement ships_left.
         stats.ships_left -= 1
+
+        # Update scoreboard.
+        sb.prep_ships()
 
         # Empty aliens and bullets.
         aliens.empty()
@@ -203,26 +207,26 @@ def ship_hit(ai_settings, stats, screen, ship, aliens, bullets):
         stats.game_active = False
         pygame.mouse.set_visible(True)
 
-def check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets):
+def check_aliens_bottom(ai_settings, screen, stats, sb, ship, aliens, bullets):
     """Have they made it to bikini bottom?"""
     screen_rect = screen.get_rect()
     for alien in aliens.sprites():
         if alien.rect.bottom >= screen_rect.bottom:
             """PSCHEW"""
-            ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
+            ship_hit(ai_settings, screen, stats, sb, ship, aliens, bullets)
             break
 
-def update_aliens(ai_settings, stats, screen, ship, aliens, bullets):
+def update_aliens(ai_settings, screen, stats, sb, ship, aliens, bullets):
     """Update the positions of all aliens in the fleet."""
     check_fleet_edges(ai_settings, aliens)
     aliens.update()
 
     # Look for smashy smash.
     if pygame.sprite.spritecollideany(ship, aliens):
-        ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
+        ship_hit(ai_settings, screen, stats, sb, ship, aliens, bullets)
 
     # Look for bikini bottom.
-    check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets)
+    check_aliens_bottom(ai_settings, screen, stats, sb, ship, aliens, bullets)
 
 def check_high_score(stats, sb):
     """Check to see if there is a new high score."""
