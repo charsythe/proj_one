@@ -5,8 +5,9 @@ class GameStats():
         """Init stats."""
         self.ai_settings = ai_settings
         self.reset_stats()
-        # Start in active state.
-        self.game_active = True
+
+        # Start in inactive state.
+        self.game_active = False
 
     def reset_stats(self):
         """Init stats that change during gameplay."""
